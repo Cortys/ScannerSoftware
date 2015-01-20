@@ -1,0 +1,10 @@
+{
+	"name": "ScannerSoftware",
+	"version": "0.1.0",
+
+	"author": "Norbert Damke",
+
+	"dependencies": {
+		"express": "^4.11.0"
+	}
+}
