@@ -1,0 +1,51 @@
+.scanField {
+	position: absolute;
+	top: 40px;
+	bottom: 40px;
+}
+
+#borrower {
+	left: 40px;
+	right: 50%;
+	border-right: 1px solid #dddddd;
+}
+
+#item {
+	right: 40px;
+	left: 50%;
+}
+
+.scanField h2 {
+	text-align: center;
+}
+
+.scanField figure {
+	position: absolute;
+	margin: 0;
+	width: 30%;
+	margin-top: -50px;
+	top: 50%;
+	left: 35%;
+}
+.scanField figure img {
+	position: absolute;
+	width: 100%;
+	margin-top: -50%;
+}
+
+.scanField p {
+	position: absolute;
+	display: block;
+	margin-top: -50px;
+	top: 90%;
+	left: 35%;
+	right: 35%;
+	text-align: center;
+	height: 50px;
+	font-size: 30px;
+	line-height: 50px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	background-color: #cccccc;
+	border-radius: 2px;
+}
