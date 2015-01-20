@@ -1,20 +1,49 @@
+var connector = (function() {
+
+	var listeners = {};
+
+	return {
+		checkIn: function(id, page, callback) {
+			if(id in listeners)
+				listeners[id].forEach(function(value, index) {
+					var result = value(page);
+					if(!index)
+						callback(result);
+				});
+		},
+		listenFor: function(id, listener) {
+			if(!(id in listeners))
+				listeners[id] = [];
+			listeners[id].push(listener);
+		}
+	};
+}());
+
 (function() {
 
 	var pages = (function() {
 
 		function Page(id, title, url) {
+
+			var that = this;
+
 			this.id = id;
 			this.title = title;
 			this.url = url;
+
+			connector.listenFor(id, function(instance) {
+				that.currentInstance = instance;
+				return that.api;
+			});
 		}
 
 		Page.prototype = {
 			id: null,
 			title: null,
 			url: null,
+			currentInstance: null,
 
 			open: function open() {
-				console.log(path+this.url);
 				$.get(path+this.url, {}, function(data) {
 					content.html(data);
 				}, "html");
@@ -23,7 +52,9 @@
 
 			close: function close() {
 				return this;
-			}
+			},
+
+			api: {}
 		};
 
 		var pages = {},
