@@ -28,10 +28,14 @@
 			handleScan: null,
 
 			checkStatus: function checkStatus() {
+				var that = this;
 				$.post("status", { borrower:this._borrower, item:this._item }, function(data) {
 					view[data.item?"render":"reset"]("item", data.item);
 					view[data.borrower?"render":"reset"]("borrower", data.borrower);
+					if(data.borrower && data.borrower.id != that._borrower)
+						that._borrower = data.borrower.id;
 				}, "json").fail(function() {
+					that._item = that._borrower = null;
 					view.reset();
 				});
 			},
@@ -119,6 +123,11 @@
 					$("#cancel", control).show();
 				else
 					$("#cancel", control).hide();
+
+				if(this._borrowerSet && this._itemSet)
+					$("#confirm").show();
+				else
+				$("#confirm").hide();
 			}
 		};
 
