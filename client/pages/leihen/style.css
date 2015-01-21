@@ -55,6 +55,9 @@ h2 {
 	background-color: #cccccc;
 	border-radius: 2px;
 	overflow: hidden;
+	-webkit-user-select: all;
+	-moz-user-select: all;
+	user-select: all;
 }
 
 #control select {

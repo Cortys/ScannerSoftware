@@ -70,7 +70,7 @@
 			control, // The controller DOM element
 			currentLendProcess,
 			currentScan = "",
-			lastLetter,
+			lastLetter = 0,
 			scanListeners = new Set();
 
 		var view = {
@@ -133,12 +133,19 @@
 
 				var that = this;
 
-				$(window).unbind(listener);
-				$(window).bind("keyup", listener = function(e) {
+				window.removeEventListener("keyup", listener, true);
+				window.addEventListener("keyup", listener = function(e) {
 					// Only accept words that were typed really fast:
-					if(lastLetter !== undefined && Date.now()-lastLetter > 20)
+					if(Date.now()-lastLetter > 10)
 						currentScan = "";
-					document.activeElement.blur();
+					else {
+						// If letter was typed fast:
+						// Blur eventually active input or select field
+						document.activeElement.blur();
+						e.preventDefault();
+						e.stopPropagation();
+					}
+
 					if(e.keyCode == 13 && currentScan !== "") {
 						scanListeners.forEach(function(scanListener) {
 							scanListener(currentScan);
@@ -148,8 +155,7 @@
 					}
 					currentScan += String.fromCharCode(e.keyCode);
 					lastLetter = Date.now();
-					e.preventDefault();
-				});
+				}, true);
 
 				$("#cancel", control).bind("click", function() {
 					that.newLendProcess();
@@ -192,7 +198,7 @@
 	var api = (function() {
 		return {
 			close: function close(done) {
-				$(document).unbind("keyup", listener);
+				window.removeEventListener("keyup", listener, true);
 				done();
 			}
 		};

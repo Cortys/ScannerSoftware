@@ -113,7 +113,7 @@ var connector = (function() {
 			},
 			openPage: function openPage(id, callback) {
 				var page = pages[id];
-				if(!page)
+				if(!page || openedPage == page)
 					return;
 				var done = function() {
 					openedPage = page.open();
@@ -188,18 +188,28 @@ var connector = (function() {
 	}());
 
 	var activityManager = (function() {
-		var lastFocus;
+		var lastFocus, visibility;
 		return {
 			init: function init(overlay) {
+
+				function setVisibility(bool) {
+					if(bool === visibility)
+						return;
+					visibility = bool;
+					if(bool)
+						overlay.fadeIn(100);
+					else
+						overlay.fadeOut(100);
+				}
+
 				document.addEventListener("visibilitychange", function() {
-					console.log(document.visibilityState);
-					overlay[document.visibilityState=="visible"?"hide":"show"]();
+					setVisibility(document.visibilityState != "visible");
 				}, false);
 
 				setInterval(function() {
 					if(lastFocus == (lastFocus = document.hasFocus()))
 						return;
-					overlay[lastFocus?"hide":"show"]();
+					setVisibility(!lastFocus);
 				}, 200);
 			}
 		};
