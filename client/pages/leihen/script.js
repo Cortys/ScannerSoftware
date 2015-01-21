@@ -133,9 +133,10 @@
 				var that = this;
 
 				$(window).bind("keyup", listener = function(e) {
-					if(lastLetter !== undefined && Date.now()-lastLetter > 100)
+					// Only accept words that were typed really fast:
+					if(lastLetter !== undefined && Date.now()-lastLetter > 20)
 						currentScan = "";
-					if(e.keyCode == 13) {
+					if(e.keyCode == 13 && currentScan !== "") {
 						scanListeners.forEach(function(scanListener) {
 							scanListener(currentScan);
 						});
