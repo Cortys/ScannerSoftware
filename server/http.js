@@ -2,7 +2,7 @@ var config = require("./config"),
 	path = require("path"),
 	express = require("express"),
 	bodyParser = require("body-parser"),
-	status = require("./status");
+	offers = require("./offers");
 
 module.exports = function(clientPath) {
 	// Start new express server:
@@ -15,9 +15,18 @@ module.exports = function(clientPath) {
 		res.status(404).send("<b>404 - File not found.</b>");
 	});
 
+	// Serve lenders data:
+	app.route("/lenders").all(function(req, res) {
+		offers.lenders().then(function(result) {
+			res.json(result);
+		}, function(err) {
+			res.status(500).json({});
+		});
+	});
+
 	// Serve status data:
 	app.route("/status").post(parser, function(req, res) {
-		status(req.body).then(function(result) {
+		offers.status(req.body).then(function(result) {
 			res.json(result);
 		}, function(err) {
 			res.status(500).json({});

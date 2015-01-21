@@ -16,7 +16,7 @@
 				else
 					that.item = word;
 			};
-
+			console.log("new LendProcess()");
 			page.addScanListener(this.handleScan);
 		}
 		LendProcess.prototype = {
@@ -28,9 +28,10 @@
 
 			checkStatus: function checkStatus() {
 				$.post("status", { borrower:this._borrower, item:this._item }, function(data) {
-					view.render("item", data.item.id, data.item.image);
+					view[data.item?"render":"reset"]("item", data.item);
+					view[data.borrower?"render":"reset"]("borrower", data.borrower);
 				}, "json").fail(function() {
-
+					view.reset();
 				});
 			},
 
@@ -38,14 +39,16 @@
 
 			},
 
-			close: function close() {
+			close: function close(callback) {
 				page.removeScanListener(this.handleScan);
 				view.reset();
+				if(typeof callback == "function")
+					callback();
 			},
 
 			set borrower(value) {
 				this._borrower = value;
-				view.render("borrower", value);
+				view.render("borrower", { id:"..." });
 				this.checkStatus();
 			},
 			get borrower() {
@@ -54,7 +57,7 @@
 
 			set item(value) {
 				this._item = value;
-				view.render("item", value);
+				view.render("item", { id:"..." });
 				this.checkStatus();
 			},
 			get item() {
@@ -62,37 +65,66 @@
 			}
 		};
 
-		var main,
+		var main, // The API object of the main page
+			control, // The controller DOM element
 			currentLendProcess,
 			currentScan = "",
+			lastLetter,
 			scanListeners = new Set();
 
 		var view = {
 			borrower: null,
 			item: null,
+			_borrowerSet: false,
+			_itemSet: false,
 
 			init: function init(borrower, item) {
 				this.borrower = borrower;
 				this.item = item;
 			},
 
-			reset: function() {
-				this.borrower.add(this.item).children("p").html("?");
+			reset: function(target) {
+				var joined = !target?this.borrower.add(this.item):this[target];
+				joined.children("p").html("?");
+				joined.each(function() {
+					var id = $(this).attr("id");
+					$(this).children("figure").children("img").attr({ src:"static/images/"+id+".svg", alt:"", title:"" });
+				});
+				if(target)
+					this["_"+target+"Set"] = false;
+				else
+					this._borrowerSet = this._itemSet = false;
+				this.updateButtons();
 			},
 
-			render: function(target, data, image) {
-				target = target=="item"?this.item:this.borrower;
+			render: function(pTarget, data) {
 
-				target.children("p").html(data);
+				if(!data)
+					return;
 
-				if(image)
-					target.children("figure").children("img").attr("src", "static/dbImages/"+image);
+				target = this[pTarget];
+
+				target.children("p").html(data.id);
+
+				if(data.image)
+					target.children("figure").children("img").attr({ src:"static/dbImages/"+data.image, alt:data.description, title:data.description });
+
+				this["_"+pTarget+"Set"] = true;
+				this.updateButtons();
 			},
+
+			updateButtons: function() {
+				if(this._borrowerSet || this._itemSet)
+					$("#cancel", control).show();
+				else
+					$("#cancel", control).hide();
+			}
 		};
 
 		var page = {
-			init: function init(pMain, borrower, item) {
+			init: function init(pMain, borrower, item, pControl) {
 				main = pMain;
+				control = pControl;
 
 				view.init(borrower, item);
 
@@ -100,7 +132,9 @@
 
 				var that = this;
 
-				$(document).bind("keyup", listener = function(e) {
+				$(window).bind("keyup", listener = function(e) {
+					if(lastLetter !== undefined && Date.now()-lastLetter > 100)
+						currentScan = "";
 					if(e.keyCode == 13) {
 						scanListeners.forEach(function(scanListener) {
 							scanListener(currentScan);
@@ -109,18 +143,29 @@
 						return;
 					}
 					currentScan += String.fromCharCode(e.keyCode);
+					lastLetter = Date.now();
 				});
 
-				$("#cancel").bind("click", function() {
+				$("#cancel", control).bind("click", function() {
 					that.newLendProcess();
 				});
+
+				$.post("lenders", {}, function(data) {
+					data.forEach(function(v, i) {
+						$("select", control).append("<option value='"+v.id+"'"+(!i?" selected":"")+">"+v.id+"</option>");
+					});
+				}).fail(function() {
+					console.error("Could not load lenders.");
+				});
+
 			},
 
 			newLendProcess: function newLendProcess(callback) {
 				if(currentLendProcess)
 					currentLendProcess.close(function() {
 						currentLendProcess = new LendProcess();
-						callback();
+						if(typeof callback == "function")
+							callback();
 					});
 			},
 

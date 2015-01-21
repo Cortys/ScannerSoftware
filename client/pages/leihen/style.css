@@ -58,30 +58,10 @@ h2 {
 }
 
 #control select {
-	-webkit-appearance: none;
 	position: relative;
 	display: block;
 	width: 50%;
 	left: 25%;
-	margin: 0;
-	font-size: 16px;
-	background-color: #efefef;
-	border: none;
-	overflow: hidden;
-	outline: none;
-	text-align: center;
-	color: #222222;
-}
-
-#control select option {
-	padding: 5px 0;
-
-	background: none;
-}
-
-#control select option:selected {
-	padding: 0;
-	background: #f00;
 }
 
 #confirm, #cancel {
@@ -102,6 +82,7 @@ h2 {
 	outline: none;
 	padding: 0;
 	line-height: 50px;
+	display: none;
 }
 
 #confirm:active {
