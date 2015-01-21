@@ -187,9 +187,28 @@ var connector = (function() {
 		};
 	}());
 
+	var activityManager = (function() {
+		var lastFocus;
+		return {
+			init: function init(overlay) {
+				document.addEventListener("visibilitychange", function() {
+					console.log(document.visibilityState);
+					overlay[document.visibilityState=="visible"?"hide":"show"]();
+				}, false);
+
+				setInterval(function() {
+					if(lastFocus == (lastFocus = document.hasFocus()))
+						return;
+					overlay[lastFocus?"hide":"show"]();
+				}, 200);
+			}
+		};
+	}());
+
 	$(function() {
 		pages.init($("content"), "static/pages/");
 		menu.init($("menu"));
+		activityManager.init($("#overlay"));
 	});
 
 }());

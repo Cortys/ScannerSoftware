@@ -17,6 +17,7 @@
 					that.item = word;
 			};
 			console.log("new LendProcess()");
+			view.reset();
 			page.addScanListener(this.handleScan);
 		}
 		LendProcess.prototype = {
@@ -132,10 +133,12 @@
 
 				var that = this;
 
+				$(window).unbind(listener);
 				$(window).bind("keyup", listener = function(e) {
 					// Only accept words that were typed really fast:
 					if(lastLetter !== undefined && Date.now()-lastLetter > 20)
 						currentScan = "";
+					document.activeElement.blur();
 					if(e.keyCode == 13 && currentScan !== "") {
 						scanListeners.forEach(function(scanListener) {
 							scanListener(currentScan);
@@ -145,10 +148,15 @@
 					}
 					currentScan += String.fromCharCode(e.keyCode);
 					lastLetter = Date.now();
+					e.preventDefault();
 				});
 
 				$("#cancel", control).bind("click", function() {
 					that.newLendProcess();
+				});
+
+				$("select", control).bind("change", function() {
+
 				});
 
 				$.post("lenders", {}, function(data) {
