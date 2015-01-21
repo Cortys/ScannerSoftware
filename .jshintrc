@@ -1,3 +1,6 @@
 {
-	"eqnull": true
+	"eqnull": true,
+	"globals": {
+		"Promise": true
+	}
 }

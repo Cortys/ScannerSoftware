@@ -1,31 +1,37 @@
-.scanField {
+.scanField, #control {
 	position: absolute;
 	top: 40px;
 	bottom: 40px;
 }
 
 #borrower {
-	left: 40px;
-	right: 50%;
-	border-right: 1px solid #dddddd;
+	left: 20px;
+	right: 62%;
 }
 
 #item {
-	right: 40px;
-	left: 50%;
+	right: 20px;
+	left: 62%;
 }
 
-.scanField h2 {
+#control {
+	left: 38%;
+	right: 38%;
+	border-left: 1px solid #cccccc;
+	border-right: 1px solid #cccccc;
+}
+
+h2 {
 	text-align: center;
 }
 
 .scanField figure {
 	position: absolute;
 	margin: 0;
-	width: 30%;
+	width: 50%;
 	margin-top: -50px;
 	top: 50%;
-	left: 35%;
+	left: 25%;
 }
 .scanField figure img {
 	position: absolute;
@@ -38,8 +44,8 @@
 	display: block;
 	margin-top: -50px;
 	top: 90%;
-	left: 35%;
-	right: 35%;
+	left: 25%;
+	right: 25%;
 	text-align: center;
 	height: 50px;
 	font-size: 30px;
@@ -48,4 +54,65 @@
 	text-overflow: ellipsis;
 	background-color: #cccccc;
 	border-radius: 2px;
+	overflow: hidden;
+}
+
+#control select {
+	-webkit-appearance: none;
+	position: relative;
+	display: block;
+	width: 50%;
+	left: 25%;
+	margin: 0;
+	font-size: 16px;
+	background-color: #efefef;
+	border: none;
+	overflow: hidden;
+	outline: none;
+	text-align: center;
+	color: #222222;
+}
+
+#control select option {
+	padding: 5px 0;
+
+	background: none;
+}
+
+#control select option:selected {
+	padding: 0;
+	background: #f00;
+}
+
+#confirm, #cancel {
+	position: absolute;
+	display: block;
+	width: 50%;
+	height: 50px;
+	background-color: #319b42;
+	border: none;
+	border-radius: 2px;
+	color: #ffffff;
+	font-size: 16px;
+	box-sizing: border-box;
+	cursor: pointer;
+	top: 50%;
+	left: 25%;
+	margin-top: -30px;
+	outline: none;
+	padding: 0;
+	line-height: 50px;
+}
+
+#confirm:active {
+	background-color: #206f27;
+}
+
+#cancel {
+	margin-top: 30px;
+	background-color: #872025;
+}
+
+#cancel:active {
+	background-color: #541016;
 }

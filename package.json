@@ -5,6 +5,9 @@
 	"author": "Norbert Damke",
 
 	"dependencies": {
-		"express": "^4.11.0"
+		"express": "^4.11.0",
+		"body-parser": "^1.10.1",
+		"mysql": "^2.5.4",
+		"bluebird": "^2.8.1"
 	}
 }

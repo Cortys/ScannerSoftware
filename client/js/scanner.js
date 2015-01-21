@@ -60,13 +60,15 @@ var connector = (function() {
 				script.type = "text/javascript";
 				script.src = path+this.url+"/script.js";
 
-				document.head.appendChild(script);
 				this._current.script = script;
 
 				// load page:
 				$.get(path+this.url+"/index.html", {}, function(data) {
 					content.html(data);
-				}, "html");
+					document.head.appendChild(script);
+				}, "html").fail(function() {
+					content.html("");
+				});
 
 				return this;
 			},
@@ -74,8 +76,11 @@ var connector = (function() {
 			close: function close(callback) {
 				var that = this,
 					done = function() {
-						document.head.removeChild(that._current.script);
-						document.head.removeChild(that._current.style);
+						content.html("");
+						if(document.head.contains(that._current.script))
+							document.head.removeChild(that._current.script);
+						if(document.head.contains(that._current.style))
+							document.head.removeChild(that._current.style);
 						that._current.instance = that._current.script = that._current.style = null;
 						callback();
 					};
@@ -106,10 +111,17 @@ var connector = (function() {
 				pages[id] = new Page(id, title, url);
 				return true;
 			},
-			openPage: function openPage(id) {
+			openPage: function openPage(id, callback) {
+				var page = pages[id];
+				if(!page)
+					return;
 				var done = function() {
-					openedPage = pages[id].open();
-					window.history.pushState({ id:id }, openedPage.title, id);
+					openedPage = page.open();
+					callback({
+						id: page.id,
+						title: page.title,
+						url: page.url
+					});
 				};
 
 				if(openedPage instanceof Page)
@@ -126,37 +138,51 @@ var connector = (function() {
 
 	var menu = (function() {
 
-		var links;
+		var links,
+			activeLink;
 
 		return {
 			init: function init(menu) {
 				links = menu.find("a");
 
-				var startPage = window.location.pathname.substr(1),
-					firstId;
+				var that = this,
+					startPage = window.location.pathname.substr(1);
 
 				links.each(function(i) {
 					var element = $(this),
 						id = element.attr("href"),
 						title = element.html(),
 						url = element.attr("data-url");
+
 					pages.addPage(id, title, url);
-
-					if(!i)
-						firstId = id;
-
 					if(startPage == id)
-						pages.openPage(id);
+						that.activateLink(element);
 
 					element.bind("click", function(e) {
-						pages.openPage(id);
+						that.activateLink(element);
 						e.preventDefault();
 					});
 				});
 
 				if(!pages.hasOpenedPage)
-					pages.openPage(firstId);
+					this.activateLink(links.first(), "replace");
 
+				window.addEventListener("popstate", function(e) {
+					if(e.state && e.state.id)
+						that.activateLink(links.filter("[href="+e.state.id+"]"), true);
+				}, false);
+			},
+			activateLink: function(link, type) {
+				if(activeLink)
+					activeLink.removeClass("active");
+				activeLink = link;
+				activeLink.addClass("active");
+				pages.openPage(link.attr("href"), function(page) {
+					if(!type)
+						window.history.pushState(page, page.title, page.id);
+					else if(type == "replace")
+						window.history.replaceState(page, page.title, page.id);
+				});
 			}
 		};
 	}());
