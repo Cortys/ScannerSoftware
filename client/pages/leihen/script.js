@@ -17,7 +17,7 @@
 					that.item = word;
 			};
 			console.log("new LendProcess()");
-			view.reset();
+			view.reset(undefined, true);
 			page.addScanListener(this.handleScan);
 		}
 		LendProcess.prototype = {
@@ -27,14 +27,20 @@
 
 			handleScan: null,
 
-			checkStatus: function checkStatus() {
+			checkStatus: function checkStatus(scannedProperty) {
 				var that = this;
 				$.post("status", { borrower:this._borrower, item:this._item }, function(data) {
-					view[data.item?"render":"reset"]("item", data.item);
-					view[data.borrower?"render":"reset"]("borrower", data.borrower);
-					if(data.borrower && data.borrower.id != that._borrower)
+					if(data.item && (data.item.id != that._item || scannedProperty == "item")) {
+						that._item = data.item.id;
+						view.render("item", data.item);
+					}
+					if(data.borrower && (data.borrower.id != that._borrower || scannedProperty == "borrower")) {
 						that._borrower = data.borrower.id;
-				}, "json").fail(function() {
+						view.render("borrower", data.borrower);
+					}
+					if(scannedProperty && !data[scannedProperty])
+						view.reset(scannedProperty);
+				}, "json").fail(function(err) {
 					that._item = that._borrower = null;
 					view.reset();
 				});
@@ -46,24 +52,24 @@
 
 			close: function close(callback) {
 				page.removeScanListener(this.handleScan);
-				view.reset();
+				view.reset(undefined, true);
 				if(typeof callback == "function")
 					callback();
 			},
 
 			set borrower(value) {
+				view.render("borrower", { id:view.waiting });
 				this._borrower = value;
-				view.render("borrower", { id:"..." });
-				this.checkStatus();
+				this.checkStatus("borrower");
 			},
 			get borrower() {
 				return this._borrower;
 			},
 
 			set item(value) {
+				view.render("item", { id:view.waiting });
 				this._item = value;
-				view.render("item", { id:"..." });
-				this.checkStatus();
+				this.checkStatus("item");
 			},
 			get item() {
 				return this._item;
@@ -78,6 +84,9 @@
 			scanListeners = new Set();
 
 		var view = {
+
+			waiting: Symbol("waiting"),
+
 			borrower: null,
 			item: null,
 			_borrowerSet: false,
@@ -88,9 +97,15 @@
 				this.item = item;
 			},
 
-			reset: function(target) {
-				var joined = !target?this.borrower.add(this.item):this[target];
-				joined.children("p").html("?");
+			reset: function(target, doNotBlink) {
+				var joined = !target?this.borrower.add(this.item):this[target],
+					pTags = joined.children("p").html("?");
+				if(!doNotBlink) {
+					pTags.addClass("red");
+					setTimeout(function() {
+						pTags.removeClass("red");
+					}, 10);
+				}
 				joined.each(function() {
 					var id = $(this).attr("id");
 					$(this).children("figure").children("img").attr({ src:"static/images/"+id+".svg", alt:"", title:"" });
@@ -104,17 +119,26 @@
 
 			render: function(pTarget, data) {
 
+				var target = this[pTarget];
+
 				if(!data)
 					return;
 
-				target = this[pTarget];
+				var pTags = target.children("p").html(data.id == this.waiting?"...":data.id);
 
-				target.children("p").html(data.id);
+				if(data.id && data.id != this.waiting) {
+					pTags.addClass("green");
+					setTimeout(function() {
+						pTags.removeClass("green");
+					}, 10);
+
+					this["_"+pTarget+"Set"] = true;
+					//this["_isReturn"] = data;
+				}
 
 				if(data.image)
 					target.children("figure").children("img").attr({ src:"static/dbImages/"+data.image, alt:data.description, title:data.description });
 
-				this["_"+pTarget+"Set"] = true;
 				this.updateButtons();
 			},
 
@@ -142,8 +166,8 @@
 
 				var that = this;
 
-				window.removeEventListener("keyup", listener, true);
-				window.addEventListener("keyup", listener = function(e) {
+				window.removeEventListener("keydown", listener, true);
+				window.addEventListener("keydown", listener = function(e) {
 					// Only accept words that were typed really fast:
 					if(Date.now()-lastLetter > 10)
 						currentScan = "";
@@ -207,7 +231,7 @@
 	var api = (function() {
 		return {
 			close: function close(done) {
-				window.removeEventListener("keyup", listener, true);
+				window.removeEventListener("keydown", listener, true);
 				done();
 			}
 		};

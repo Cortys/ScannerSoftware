@@ -58,6 +58,23 @@ h2 {
 	-webkit-user-select: all;
 	-moz-user-select: all;
 	user-select: all;
+	-webkit-transition: all 1s ease-out;
+	-moz-transition: all 1s ease-out;
+	transition: all 1s ease-out;
+}
+
+.scanField p.red {
+	background-color: #ff7176;
+	-webkit-transition: none;
+	-moz-transition: none;
+	transition: none;
+}
+
+.scanField p.green {
+	background-color: #7aff4c;
+	-webkit-transition: none;
+	-moz-transition: none;
+	transition: none;
 }
 
 #control select {

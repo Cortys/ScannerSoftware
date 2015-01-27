@@ -40,4 +40,5 @@ module.exports = function(clientPath) {
 
 	// Bind server to port:
 	app.listen(config.port);
+	console.log("HTTP started on port "+config.port+".");
 };
