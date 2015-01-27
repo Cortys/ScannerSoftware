@@ -30,16 +30,27 @@
 			checkStatus: function checkStatus(scannedProperty) {
 				var that = this;
 				$.post("status", { borrower:this._borrower, item:this._item }, function(data) {
-					if(data.item && (data.item.id != that._item || scannedProperty == "item")) {
+					// Render item/borrower if:
+					// we got data for them
+					// and they were scanned just before the checkStatus-call
+					// or if they weren't scanned before, they gave us new information
+					if(data.item && (scannedProperty == "item" || scannedProperty != "item" && data.item.id != that._item)) {
+						// Third parameter of render call: Let the scan box blink red if true. Green elsewise.
+						// An error (= red = true) will be indicated if the item was scanned by the user and the server responded with another item. This means, the scan was considered to be falsey.
+						view.render("item", data.item, scannedProperty == "item" && data.item.id != that._item);
 						that._item = data.item.id;
-						view.render("item", data.item);
 					}
-					if(data.borrower && (data.borrower.id != that._borrower || scannedProperty == "borrower")) {
+					if(data.borrower && (scannedProperty == "borrower" || scannedProperty != "borrower" && data.borrower.id != that._borrower)) {
+						// Render call similar to the one for the item.
+						view.render("borrower", data.borrower, scannedProperty == "borrower" && data.borrower.id != that._borrower);
 						that._borrower = data.borrower.id;
-						view.render("borrower", data.borrower);
 					}
-					if(scannedProperty && !data[scannedProperty])
+
+					// If the scanned property gave no result at all: reset.
+					if(scannedProperty && !data[scannedProperty]) {
+						that["_"+scannedProperty] = null;
 						view.reset(scannedProperty);
+					}
 				}, "json").fail(function(err) {
 					that._item = that._borrower = null;
 					view.reset();
@@ -117,9 +128,10 @@
 				this.updateButtons();
 			},
 
-			render: function(pTarget, data) {
+			render: function(pTarget, data, doBlinkRed) {
 
-				var target = this[pTarget];
+				var target = this[pTarget],
+					color = doBlinkRed?"red":"green";
 
 				if(!data)
 					return;
@@ -127,9 +139,10 @@
 				var pTags = target.children("p").html(data.id == this.waiting?"...":data.id);
 
 				if(data.id && data.id != this.waiting) {
-					pTags.addClass("green");
+
+					pTags.addClass(color);
 					setTimeout(function() {
-						pTags.removeClass("green");
+						pTags.removeClass(color);
 					}, 10);
 
 					this["_"+pTarget+"Set"] = true;

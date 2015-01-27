@@ -20,7 +20,7 @@ module.exports = function(clientPath) {
 		offers.lenders().then(function(result) {
 			res.json(result);
 		}, function(err) {
-			res.status(500).json({});
+			res.status(404).json({});
 		});
 	});
 
@@ -29,7 +29,7 @@ module.exports = function(clientPath) {
 		offers.status(req.body).then(function(result) {
 			res.json(result);
 		}, function(err) {
-			res.status(500).json({});
+			res.status(404).json({});
 		});
 	});
 
