@@ -92,6 +92,7 @@
 			currentLendProcess,
 			currentScan = "",
 			lastLetter = 0,
+			lastActive,
 			scanListeners = new Set();
 
 		var view = {
@@ -102,6 +103,7 @@
 			item: null,
 			_borrowerSet: false,
 			_itemSet: false,
+			_isReturn: false,
 
 			init: function init(borrower, item) {
 				this.borrower = borrower;
@@ -146,8 +148,10 @@
 					}, 10);
 
 					this["_"+pTarget+"Set"] = true;
-					//this["_isReturn"] = data;
 				}
+
+				if(pTarget == "borrower")
+					this._isReturn = data.isReturn;
 
 				if(data.image)
 					target.children("figure").children("img").attr({ src:"static/dbImages/"+data.image, alt:data.description, title:data.description });
@@ -162,7 +166,7 @@
 					$("#cancel", control).hide();
 
 				if(this._borrowerSet && this._itemSet)
-					$("#confirm").show();
+					$("#confirm").show().val(this._isReturn?"Zurücknehmen":"Verleihen");
 				else
 				$("#confirm").hide();
 			}
@@ -186,8 +190,10 @@
 						currentScan = "";
 					else {
 						// If letter was typed fast:
-						// Blur eventually active input or select field
-						document.activeElement.blur();
+						// Ignore input in textfield
+
+						if(lastActive && currentScan.length <= 1 && lastActive.tagName.toUpperCase() == "INPUT")
+							lastActive.value = lastActive.value.slice(0, -1);
 						e.preventDefault();
 						e.stopPropagation();
 					}
@@ -201,6 +207,7 @@
 					}
 					currentScan += String.fromCharCode(e.keyCode);
 					lastLetter = Date.now();
+					lastActive = document.activeElement;
 				}, true);
 
 				$("#cancel", control).bind("click", function() {
