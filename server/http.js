@@ -7,7 +7,7 @@ var config = require("./config"),
 module.exports = function(clientPath) {
 	// Start new express server:
 	var app = express(),
-		parser = bodyParser.urlencoded({ extended:false });
+		parser = bodyParser.urlencoded({ extended:true });
 
 	// Serve files from FS:
 	app.use("/static", express.static(clientPath));

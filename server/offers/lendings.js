@@ -5,7 +5,7 @@ module.exports = function(request) {
 
 	if(typeof request !== "object" || request === null)
 		request = {};
-
+	
 	if(typeof request.order !== "object" || request === null)
 		request.order = {
 			column: "start"

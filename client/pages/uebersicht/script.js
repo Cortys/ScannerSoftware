@@ -2,17 +2,41 @@
 
 	var filter = (function() {
 
-		var domFilters;
+		var domFilters,
+			domHeaders;
 
 		return {
-			init: function(pDomFilters) {
+			init: function(pDomFilters, pDomHeaders) {
 				domFilters = pDomFilters;
+
+				domHeaders = pDomHeaders;
 
 				domFilters.on("click", function() {
 					domFilters.filter(".active").removeClass("active");
 					$(this).addClass("active");
 					table.endedLendings = this.getAttribute("data-ended")*1;
 				});
+
+				var that = this;
+
+				domHeaders.on("click", function() {
+					that.sortHeader.children("span").html("");
+
+					var v = $(this),
+						column = v.attr("data-column"),
+						asc = that.sortHeader[0] == this ? !table.order.asc : (v.attr("data-is-date") ? false : true);
+
+					v.children("span").html(" "+(asc ? "&#x2191;": "&#x2193;"));
+
+					table.order = {
+						column: column,
+						asc: asc
+					};
+				});
+			},
+
+			get sortHeader() {
+				return domHeaders.filter("[data-column="+table.order.column+"]");
 			}
 		};
 	}());
@@ -52,6 +76,16 @@
 				this.update();
 			},
 
+			get order() {
+				return Object.create(request.order);
+			},
+
+			set order(value) {
+				request.order.column = value.column;
+				request.order.asc = !!value.asc;
+				this.update();
+			},
+
 			update: function() {
 				$.post("/lendings", request, function(result) {
 					domTable.find("tr.entry").remove();
@@ -68,7 +102,7 @@
 								}(insert);
 							else if(insert == null)
 								insert = "-";
-							
+
 							rowHtml += "<td>"+insert+"</td>";
 						});
 						rowHtml += "</tr>";
@@ -89,7 +123,7 @@
 
 	connector.checkIn("uebersicht", api, function(main) {
 		table.init($("#overview table"));
-		filter.init($("#filter button"));
+		filter.init($("#filter button"), $("#overview table th"));
 	});
 
 }());
