@@ -1,0 +1,65 @@
+#filter {
+	position: relative;
+	margin: 20px auto;
+	text-align: center;
+}
+
+#filter button {
+	-webkit-appearance: none;
+	border: none;
+	background: none;
+	padding: 0 20px;
+	font-size: 1.3em;
+	height: 40px;
+	border: 1px solid #1b5f73;
+	box-sizing: border-box;
+	color: #222222;
+	outline: none;
+	cursor: pointer;
+}
+
+#filter button:first-child {
+	border-top-left-radius: 20px;
+	border-bottom-left-radius: 20px;
+}
+
+#filter button:last-child {
+	border-top-right-radius: 20px;
+	border-bottom-right-radius: 20px;
+}
+
+#filter button.active {
+	color: #ffffff;
+	background: #1b5f73;
+}
+
+#overview {
+	position: relative;
+	margin: 20px auto;
+	width: 90%;
+	max-width: 1000px;
+}
+
+#overview table {
+	width: 100%;
+	border-spacing: 0;
+}
+
+#overview tr th {
+	color: #1b5f73;
+	text-align: center;
+	line-height: 2.5em;
+	border-bottom: 1px solid #1b5f73;
+}
+
+#overview td {
+	line-height: 2em;
+	text-align: center;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	padding: 0 5px;
+}
+
+#overview tr:nth-child(2n) td {
+	background-color: #fafafa;
+}
