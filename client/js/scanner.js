@@ -4,15 +4,15 @@ var connector = (function() {
 
 	return {
 		checkIn: function(id, page, callback) {
-			if(id in listeners)
+			if (id in listeners)
 				listeners[id].forEach(function(value, index) {
 					var result = value(page);
-					if(!index)
+					if (!index)
 						callback(result);
 				});
 		},
 		listenFor: function(id, listener) {
-			if(!(id in listeners))
+			if (!(id in listeners))
 				listeners[id] = [];
 			listeners[id].push(listener);
 		}
@@ -50,7 +50,7 @@ var connector = (function() {
 				var style = document.createElement("link");
 				style.rel = "stylesheet";
 				style.type = "text/css";
-				style.href = path+this.url+"/style.css";
+				style.href = path + this.url + "/style.css";
 
 				document.head.appendChild(style);
 				this._current.style = style;
@@ -58,12 +58,12 @@ var connector = (function() {
 				// load script:
 				var script = document.createElement("script");
 				script.type = "text/javascript";
-				script.src = path+this.url+"/script.js";
+				script.src = path + this.url + "/script.js";
 
 				this._current.script = script;
 
 				// load page:
-				$.get(path+this.url+"/index.html", {}, function(data) {
+				$.get(path + this.url + "/index.html", {}, function(data) {
 					content.html(data);
 					document.head.appendChild(script);
 				}, "html").fail(function() {
@@ -77,14 +77,14 @@ var connector = (function() {
 				var that = this,
 					done = function() {
 						content.html("");
-						if(document.head.contains(that._current.script))
+						if (document.head.contains(that._current.script))
 							document.head.removeChild(that._current.script);
-						if(document.head.contains(that._current.style))
+						if (document.head.contains(that._current.style))
 							document.head.removeChild(that._current.style);
 						that._current.instance = that._current.script = that._current.style = null;
 						callback();
 					};
-				if(this._current.instance == null || typeof this._current.instance.close !== "function")
+				if (this._current.instance == null || typeof this._current.instance.close !== "function")
 					done();
 				else
 					this._current.instance.close(done);
@@ -106,14 +106,14 @@ var connector = (function() {
 			},
 
 			addPage: function addPage(id, title, url) {
-				if(id in pages)
+				if (id in pages)
 					return false;
 				pages[id] = new Page(id, title, url);
 				return true;
 			},
 			openPage: function openPage(id, callback) {
 				var page = pages[id];
-				if(!page || openedPage == page)
+				if (!page || openedPage == page)
 					return;
 				var done = function() {
 					openedPage = page.open();
@@ -124,7 +124,7 @@ var connector = (function() {
 					});
 				};
 
-				if(openedPage instanceof Page)
+				if (openedPage instanceof Page)
 					openedPage.close(done);
 				else
 					done();
@@ -155,7 +155,7 @@ var connector = (function() {
 						url = element.attr("data-url");
 
 					pages.addPage(id, title, url);
-					if(startPage == id)
+					if (startPage == id)
 						that.activateLink(element);
 
 					element.bind("click", function(e) {
@@ -164,23 +164,23 @@ var connector = (function() {
 					});
 				});
 
-				if(!pages.hasOpenedPage)
+				if (!pages.hasOpenedPage)
 					this.activateLink(links.first(), "replace");
 
 				window.addEventListener("popstate", function(e) {
-					if(e.state && e.state.id)
-						that.activateLink(links.filter("[href="+e.state.id+"]"), true);
+					if (e.state && e.state.id)
+						that.activateLink(links.filter("[href=" + e.state.id + "]"), true);
 				}, false);
 			},
 			activateLink: function(link, type) {
-				if(activeLink)
+				if (activeLink)
 					activeLink.removeClass("active");
 				activeLink = link;
 				activeLink.addClass("active");
 				pages.openPage(link.attr("href"), function(page) {
-					if(!type)
+					if (!type)
 						window.history.pushState(page, page.title, page.id);
-					else if(type == "replace")
+					else if (type == "replace")
 						window.history.replaceState(page, page.title, page.id);
 				});
 			}
@@ -193,10 +193,10 @@ var connector = (function() {
 			init: function init(overlay) {
 
 				function setVisibility(bool) {
-					if(bool === visibility)
+					if (bool === visibility)
 						return;
 					visibility = bool;
-					if(bool)
+					if (bool)
 						overlay.fadeIn(100);
 					else
 						overlay.fadeOut(100);
@@ -207,7 +207,7 @@ var connector = (function() {
 				}, false);
 
 				setInterval(function() {
-					if(lastFocus == (lastFocus = document.hasFocus()))
+					if (lastFocus == (lastFocus = document.hasFocus()))
 						return;
 					setVisibility(!lastFocus);
 				}, 200);

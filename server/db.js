@@ -16,6 +16,4 @@ connection.connect(function(err) {
 		console.log("Database connection established.");
 });
 
-connection.escape = mysql.escape.bind(mysql);
-
 module.exports = connection;

@@ -33,6 +33,15 @@ module.exports = function(clientPath) {
 		});
 	});
 
+	// Serve lendings data:
+	app.route("/lendings").post(parser, function(req, res) {
+		offers.lendings(req.body).then(function(result) {
+			res.json(result);
+		}, function() {
+			res.status(404).json([]);
+		});
+	});
+
 	// Serve index.html as default response:
 	app.use(function(req, res, next) {
 		res.sendFile(path.join(clientPath, "index.html"));

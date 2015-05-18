@@ -1,4 +1,5 @@
 module.exports = {
 	lenders: require("./lenders"),
-	status: require("./status")
+	status: require("./status"),
+	lendings: require("./lendings")
 };
