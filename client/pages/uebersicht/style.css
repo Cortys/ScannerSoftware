@@ -48,8 +48,10 @@
 #overview tr th {
 	color: #1b5f73;
 	text-align: center;
+	font-weight: bold;
 	line-height: 2.5em;
 	border-bottom: 1px solid #1b5f73;
+	cursor: pointer;
 }
 
 #overview td {

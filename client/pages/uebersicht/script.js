@@ -34,7 +34,10 @@
 				domTable = pDomTable;
 
 				domTable.find("tr th").each(function(i,e) {
-					headers.push(e.getAttribute("data-column"));
+					headers.push({
+						name: e.getAttribute("data-column"),
+						isDate: e.getAttribute("data-is-date")
+					});
 				});
 
 				this.update();
@@ -55,7 +58,18 @@
 					result.forEach(function(row, i) {
 						var rowHtml = "<tr class='entry'>";
 						headers.forEach(function(column) {
-							rowHtml += "<td>"+row[column]+"</td>";
+
+							var insert = row[column.name];
+
+							if(insert != null && column.isDate)
+								insert = function(a) {
+									var date = new Date(a);
+									return nullFill(date.getDate(), 2) + "." + nullFill(date.getMonth()+1, 2) + "." + date.getFullYear() + " " + nullFill(date.getHours(), 2) + ":" + nullFill(date.getMinutes(), 2);
+								}(insert);
+							else if(insert == null)
+								insert = "-";
+							
+							rowHtml += "<td>"+insert+"</td>";
 						});
 						rowHtml += "</tr>";
 						domTable.append(rowHtml);

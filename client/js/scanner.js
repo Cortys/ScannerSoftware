@@ -19,6 +19,13 @@ var connector = (function() {
 	};
 }());
 
+function nullFill(num, len) {
+	num += "";
+	while(num.length < len)
+		num = "0" + num;
+	return num;
+}
+
 (function() {
 
 	var pages = (function() {
