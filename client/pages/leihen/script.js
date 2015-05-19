@@ -9,6 +9,10 @@
 			var that = this;
 
 			this.handleScan = function handleScan(word) {
+
+				if(word == null)
+					word = "";
+
 				word = word.substr(word.indexOf(" ")+1);
 
 				if(isNaN(word))
@@ -22,6 +26,7 @@
 		}
 		LendProcess.prototype = {
 			_borrower: null,
+			_isReturn: null,
 			_item: null,
 			lender: null,
 
@@ -40,10 +45,11 @@
 						view.render("item", data.item, scannedProperty == "item" && data.item.id != that._item);
 						that._item = data.item.id;
 					}
-					if(data.borrower && (scannedProperty == "borrower" || scannedProperty != "borrower" && data.borrower.id != that._borrower)) {
+					if(data.borrower && (scannedProperty == "borrower" || scannedProperty != "borrower" && (data.borrower.id != that._borrower || data.borrower.isReturn != that._isReturn))) {
 						// Render call similar to the one for the item.
 						view.render("borrower", data.borrower, scannedProperty == "borrower" && data.borrower.id != that._borrower);
 						that._borrower = data.borrower.id;
+						that._isReturn = data.borrower.isReturn;
 					}
 
 					// If the scanned property gave no result at all: reset.
@@ -57,8 +63,23 @@
 				});
 			},
 
-			proceed: function proceed() {
-
+			proceed: function proceed(success) {
+				page.removeScanListener(this.handleScan);
+				var that = this;
+				$.post("handleLendProcess", {
+					borrower: this._borrower,
+					item: this._item,
+					lender: this.lender
+				}, function(data) {
+					if(data.success) {
+						view.showSuccess();
+						that.close(success);
+					}
+					else
+						view.showFailure();
+				}, "json").fail(function(err) {
+					view.showFailure();
+				});
 			},
 
 			close: function close(callback) {
@@ -130,6 +151,22 @@
 				this.updateButtons();
 			},
 
+			showSuccess: function() {
+				this.reset(undefined, true);
+				$("#success").addClass("shown");
+				setTimeout(function() {
+					$("#success").removeClass("shown");
+				}, 10);
+			},
+
+			showFailure: function() {
+				var pTags = this.borrower.add(this.item).children("p");
+				pTags.addClass("red");
+				setTimeout(function() {
+					pTags.removeClass("red");
+				}, 10);
+			},
+
 			render: function(pTarget, data, doBlinkRed) {
 
 				var target = this[pTarget],
@@ -137,7 +174,7 @@
 
 				if(!data)
 					return;
-
+				console.log(data);
 				var pTags = target.children("p").html(data.id == this.waiting?"...":data.id);
 
 				if(data.id && data.id != this.waiting) {
@@ -214,8 +251,13 @@
 					that.newLendProcess();
 				});
 
-				$("select", control).bind("change", function() {
-
+				$("#confirm", control).bind("click", function() {
+					if(!currentLendProcess)
+						return;
+					currentLendProcess.lender = $("select", control).val();
+					currentLendProcess.proceed(function() {
+						that.newLendProcess();
+					});
 				});
 
 				$.post("lenders", {}, function(data) {

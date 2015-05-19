@@ -117,3 +117,22 @@ h2 {
 #cancel:active {
 	background-color: #541016;
 }
+
+#success {
+	position: absolute;
+	width: 60%;
+	height: 60%;
+	object-fit: contain;
+	left: 20%;
+	top: 20%;
+	opacity: 0;
+	-webkit-transition: all 1s ease-out 0.5s;
+	-moz-transition: all 1s ease-out 0.5s;
+	transition: all 1s ease-out 0.5s;
+}
+#success.shown {
+	opacity: 1;
+	-webkit-transition: none;
+	-moz-transition: none;
+	transition: none;
+}

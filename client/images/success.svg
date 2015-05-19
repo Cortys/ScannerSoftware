@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="300px" height="300px" viewBox="0 0 300 300" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M123.345314,175.649891 L76.4468756,128.751453 L47.7218403,157.476488 L125.567932,235.32258 L126.148355,234.742157 L126.934122,235.527924 L251.362311,111.099735 L219.628891,79.3663149 L123.345314,175.649891 Z M150,300 C232.842712,300 300,232.842712 300,150 C300,67.1572875 232.842712,0 150,0 C67.1572875,0 0,67.1572875 0,150 C0,232.842712 67.1572875,300 150,300 Z" id="success" fill="#62E138"></path>
+    </g>
+</svg>

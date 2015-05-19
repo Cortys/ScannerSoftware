@@ -42,6 +42,15 @@ module.exports = function(clientPath) {
 		});
 	});
 
+	// Handle LendProcess:
+	app.route("/handleLendProcess").post(parser, function(req, res) {
+		offers.handleLendProcess(req.body).then(function(result) {
+			res.json(result);
+		}, function() {
+			res.status(404).json({});
+		});
+	});
+
 	// Serve index.html as default response:
 	app.use(function(req, res, next) {
 		res.sendFile(path.join(clientPath, "index.html"));
