@@ -17,6 +17,8 @@
 2. Install a MySQL database.
 3. Download code from this repository.
 4. Import `database.sql` into the MySQL database.
+	* **Contains no data!**
+	* Add dummy user and inventory database entries before starting the application.
 5. Open `server/config.js`:
 	1. Enter database credentials.
 	2. *Optional* Change the HTTP port of the application. 6001 by default.
